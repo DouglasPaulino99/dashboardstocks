@@ -26,9 +26,9 @@ app.layout = html.Div([
 
 index_page = html.Div([
     html.H1(
-            children='Dashboard exibindo informações como o Preço e Volume de ações'),
+            children='Dashboard exibindo informações como o Preço e Volume de ações feito por Douglas Paulino'),
 
-        html.Div(
+    html.Div(
             children='Alguns conceitos utilizando dash foram treinados. O foco não foi desenvolver o html e sim os gráficos e suas exibições, apesar disso, o uso foi inevitável.'),
 
     html.Br(),
@@ -58,8 +58,8 @@ page_price = html.Div(
         
         dcc.Checklist(
             id='checklist',
-            options=['ITUB3', 'avg_30','avg_7'], #pegar valor do Dropdown 
-            value=['ITUB3', 'avg_30','avg_7']),
+            options=['ITUB3', 'Média de 30 dias','Média de 7 dias'], #pegar valor do Dropdown 
+            value=['ITUB3', 'Média de 30 dias','Média de 7 dias']),
 
         dcc.Graph(
             id='graph',
@@ -87,18 +87,18 @@ def changeText(value, value2): #tentar referenciar outro nome ao inves de 'value
     fig = go.Figure()
 
     if str(value) in value2:
-        fig.add_trace(go.Candlestick(x=df_selected['Date'],
+        fig.add_trace(go.Candlestick(name=str(value),x=df_selected['Date'],
                 open=df_selected['Open'], high=df_selected['High'],
                 low=df_selected['Low'], close=df_selected['Close'])
                       )   
                            
-    if 'avg_7' in value2:
-        fig.add_trace(go.Scatter(x=df_selected.index, y=med7))
+    if 'Média de 7 dias' in value2:
+        fig.add_trace(go.Scatter(name='Média de 7 dias',x=df_selected.index, y=med7))
 
-    if 'avg_30' in value2:    
-        fig.add_trace(go.Scatter(x=df_selected.index, y=med30))
+    if 'Média de 30 dias' in value2:    
+        fig.add_trace(go.Scatter(name='Média de 30 dias', x=df_selected.index, y=med30))
     
-    return fig, [value, 'avg_30','avg_7']
+    return fig, [value, 'Média de 30 dias','Média de 7 dias']
 
 page_volume = html.Div([
     html.H1('Comparação do Volume diário de negociação das ações'),
@@ -144,8 +144,10 @@ page_volume = html.Div([
 
 def update_graph(nomes):
     dff = df[df.Stock.isin(nomes)]
-    fig = px.line(data_frame=dff, x='Date', y = 'Volume', color = 'Stock',
-                  title='Clique sobre um ponto para atualizar o gráfico de pizza')
+    fig = px.line(data_frame=dff, x='Date', y = 'Volume', color = 'Stock', labels={'Stock':'Ação', 'Date':'Data'})
+    fig.update_layout(
+        title='<b>Clique sobre um ponto para atualizar o gráfico de pizza</b>',
+        font=dict(family="Arial",size=18))
     fig.update_traces(mode='lines+markers')
     return fig
 
@@ -157,15 +159,15 @@ def update_graph(nomes):
 )
 
 def update_side_graph(hov_data, clk_data, nomes):
-    if clk_data is None:
+    if hov_data is None:
         dff2 = df[df.Stock.isin(nomes)]
         dff2 = dff2[dff2.Date=='2019-01-14']        
-        fig2 = px.pie(data_frame=dff2, values='Volume', names='Stock',
+        fig2 = px.pie(data_frame=dff2, values='Volume', names='Stock', labels={'Stock':'Ação'},
         title= 'Volume para: 2019-01-14' )
         return fig2
     else:
         dff2 = df[df.Stock.isin(nomes)]
-        hov_year = clk_data['points'][0]['x']
+        hov_year = hov_data['points'][0]['x']
         dff2 = dff2[dff2.Date == hov_year]
         print(dff2.Date == hov_year)
         fig2 = px.pie(data_frame=dff2, values='Volume', names='Stock', 
