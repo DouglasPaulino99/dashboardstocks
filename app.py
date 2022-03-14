@@ -146,7 +146,7 @@ def update_graph(nomes):
     dff = df[df.Stock.isin(nomes)]
     fig = px.line(data_frame=dff, x='Date', y = 'Volume', color = 'Stock', labels={'Stock':'Ação', 'Date':'Data'})
     fig.update_layout(
-        title='<b>Clique sobre um ponto para atualizar o gráfico de pizza</b>',
+        title='<b>Passe sobre um ponto para atualizar o gráfico de pizza</b>',
         font=dict(family="Arial",size=18))
     fig.update_traces(mode='lines+markers')
     return fig
